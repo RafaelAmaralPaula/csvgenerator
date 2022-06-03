@@ -5,8 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.*;
 
 @Component
 public class ExampleJdbcTemplate {
@@ -15,31 +14,35 @@ public class ExampleJdbcTemplate {
     private JdbcTemplate jdbcTemplate;
 
 
-    public void findAll(){
-        var listColumnValue = new ArrayList<>();
-        jdbcTemplate.query("select * from tb_product", resultSet -> {
-            var listColumnName = new ArrayList<DataModel>();
 
-            // String[][] dados = new String[resultSet.getMetaData().getColumnCount()][];
-
-            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                var dataModel = new DataModel(resultSet.getMetaData().getColumnName(i));
-                listColumnName.add(dataModel);
-            }
-
-            listColumnName.forEach(dataModel -> {
-                try {
-                    //System.out.println("Coluna: " + dataModel.getColumn() + " Valor: " + resultSet.getString(dataModel.getColumn()));
-                    var data = resultSet.getString(dataModel.getColumn());
-                    System.out.println(data);
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-            });
-
-        });
+    public DataModel findOne(){
+        var lines = jdbcTemplate.queryForList("select * from tb_product");
+        var dataModel = new DataModel();
+        dataModel.setHeader(toStringConvertHeader(lines.get(0).keySet()));
+        lines.forEach(line -> dataModel.getRows().add(toStringConvertRow(line.values())));
+        return dataModel;
     }
 
+    private String[] toStringConvertRow(Collection<Object> values) {
+        String [] lines = new String[values.size()];
+        int i = 0;
+
+        for(Object line : values){
+          lines[i] = line.toString();
+          i++;
+        }
+
+        return lines;
+    }
+
+    private String[] toStringConvertHeader(Set<String> keySet){
+        String[] header = new String[keySet.size()];
+        int i = 0;
+
+        for(String key : keySet ){
+            header[i] = key;
+            i++;
+        }
+        return header;
+    }
 }

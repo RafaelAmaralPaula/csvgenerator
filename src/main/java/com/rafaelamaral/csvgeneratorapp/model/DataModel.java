@@ -4,29 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataModel {
-    private String column;
 
-    private List<String> rows;
+    private String[] header;
+    private List<String[]> rows;
 
-    public DataModel(String column) {
-        this.column = column;
+    public DataModel() {
         this.rows = new ArrayList<>();
     }
 
-    public String getColumn() {
-        return column;
-    }
-
-    public void setColumn(String column) {
-        this.column = column;
-    }
-
-    public List<String> getRows() {
+    public List<String[]> getRows() {
         return rows;
     }
 
-    public void setRows(List<String> rows) {
-        this.rows = rows;
+    public void setHeader(String[] header) {
+        this.header = header;
+    }
+
+    public String[] getHeader() {
+        return header;
     }
 }
 

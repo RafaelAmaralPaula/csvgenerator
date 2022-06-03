@@ -1,5 +1,6 @@
 package com.rafaelamaral.csvgeneratorapp.service;
 
+import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Service
 public class GenerationFileCsv {
@@ -25,15 +27,15 @@ public class GenerationFileCsv {
 
     private void generateCsvFile() throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
 
-        exampleJdbcTemplate.findAll();
+        var dataModel = exampleJdbcTemplate.findOne();
 
         Writer writer = Files.newBufferedWriter(Paths.get("files-csv/products.csv"));
-        StatefulBeanToCsv<Object> beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
-        // beanToCsv.write(list);
+        CSVWriter csvWriter = new CSVWriter(writer);
+        csvWriter.writeNext(dataModel.getHeader());
+        csvWriter.writeAll(dataModel.getRows());
 
-        writer.flush();
+        csvWriter.flush();
         writer.close();
-
     }
 
 }
