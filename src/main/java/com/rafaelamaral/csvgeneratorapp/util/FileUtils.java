@@ -5,17 +5,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
+import static java.util.Objects.requireNonNull;
 
 public class FileUtils {
 
-    private FileUtils(){}
+    private FileUtils() {
+    }
 
     public static String createdDirectory(String name) throws IOException {
         Path path = Paths.get(name);
@@ -25,26 +24,25 @@ public class FileUtils {
         return name;
     }
 
-    public static List<String> getContentsAllFiles() throws IOException {
-        File folder = new File("queries");
-        List<String> files = new ArrayList<>();
-        for (int i = 0; i < folder.listFiles().length; i++) {
-            files.add(folder.listFiles()[i].getName());
+    public static List<String> getContentsAllFiles(String queriesPathName) {
+        var folder = new File(queriesPathName);
+        var files = new ArrayList<String>();
+        for (int i = 0; i < requireNonNull(folder.listFiles()).length; i++) {
+            files.add(requireNonNull(folder.listFiles())[i].getName());
         }
         return files;
     }
 
-    public static Map<String, String> getContentFile() throws IOException {
-        Map<String, String> objects = new HashMap<>();
-
-        FileUtils.getContentsAllFiles().forEach(fileName -> {
-            Path path = Paths.get("queries/" + fileName);
-            StringBuilder sb = new StringBuilder();
+    public static Map<String, String> getContentFile(String queriesPathName) {
+        var objects = new HashMap<String, String>();
+        getContentsAllFiles(queriesPathName).forEach(fileName -> {
             try {
-                readAllLines(path).forEach(line -> sb.append(line.concat(" ")));
-            } catch (IOException ignore) {}
-
-            objects.put(fileName, sb.toString());
+                StringBuilder sb = new StringBuilder();
+                readAllLines(Paths.get(queriesPathName + "/" + fileName))
+                        .forEach(line -> sb.append(line.concat(" ")));
+                objects.put(fileName, sb.toString());
+            } catch (IOException ignore) {
+            }
         });
         return objects;
     }
