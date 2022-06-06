@@ -5,6 +5,7 @@ import java.util.List;
 
 public class DataModel {
 
+    private String fileName;
     private String[] header;
     private List<String[]> rows;
 
@@ -22,6 +23,14 @@ public class DataModel {
 
     public String[] getHeader() {
         return header;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }
 

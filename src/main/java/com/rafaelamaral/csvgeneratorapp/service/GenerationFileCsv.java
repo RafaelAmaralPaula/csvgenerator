@@ -1,11 +1,11 @@
 package com.rafaelamaral.csvgeneratorapp.service;
 
 import com.opencsv.CSVWriter;
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
+
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.rafaelamaral.csvgeneratorapp.repository.ExampleJdbcTemplate;
+import com.rafaelamaral.csvgeneratorapp.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 @Service
 public class GenerationFileCsv {
@@ -29,8 +28,12 @@ public class GenerationFileCsv {
 
         var dataModel = exampleJdbcTemplate.findOne();
 
-        Writer writer = Files.newBufferedWriter(Paths.get("files-csv/products.csv"));
-        CSVWriter csvWriter = new CSVWriter(writer);
+        Writer writer = Files.newBufferedWriter(Paths.get(FileUtils.createdDirectory("results")+"/"+dataModel.getFileName()));
+        CSVWriter csvWriter = new CSVWriter(writer, ',',
+                CSVWriter.NO_QUOTE_CHARACTER,
+                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                CSVWriter.DEFAULT_LINE_END);
+
         csvWriter.writeNext(dataModel.getHeader());
         csvWriter.writeAll(dataModel.getRows());
 
