@@ -33,6 +33,7 @@ public class FileUtils {
         return files;
     }
 
+    // TODO: Rafa mudar este Map de retorno para uma lista com POJOs
     public static Map<String, String> getContentFile(String queriesPathName) {
         var objects = new HashMap<String, String>();
         getContentsAllFiles(queriesPathName).forEach(fileName -> {

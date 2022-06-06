@@ -19,7 +19,10 @@ public class ExampleJdbcTemplate {
     @Autowired
     private AppConfig.Property property;
 
+    // TODO: Retornar uma lista de DataModel
     public DataModel findOne() throws IOException {
+
+        // TODO: Criar iteracao sobre a lista retornada
         var result = FileUtils.getContentFile(property.getQueriesPathName());
 
         var lines = jdbcTemplate.queryForList("select * from product");
