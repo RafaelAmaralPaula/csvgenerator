@@ -26,6 +26,7 @@ public class GenerationFileCsv {
 
     private void generateCsvFile() throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
 
+        // TODO: Iterar lista retornada
         var dataModel = exampleJdbcTemplate.findOne();
 
         Writer writer = Files.newBufferedWriter(Paths.get(FileUtils.createdDirectory("results")+"/"+dataModel.getFileName()));

@@ -34,3 +34,5 @@ build/
 
 ### My setting###
 /files-csv
+/*/*.sql
+/results
