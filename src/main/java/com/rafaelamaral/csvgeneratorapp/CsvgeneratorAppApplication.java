@@ -2,7 +2,7 @@ package com.rafaelamaral.csvgeneratorapp;
 
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
-import com.rafaelamaral.csvgeneratorapp.service.GenerationFileCsv;
+import com.rafaelamaral.csvgeneratorapp.engine.CsvFileGenerator;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +18,7 @@ public class CsvgeneratorAppApplication {
 	}
 
 	@Bean
-	public CommandLineRunner run(GenerationFileCsv generationFileCsv)throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+	public CommandLineRunner run(CsvFileGenerator generationFileCsv)throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
 		return args -> {
 			generationFileCsv.execute();
 		};

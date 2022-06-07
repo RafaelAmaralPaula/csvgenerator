@@ -1,25 +1,25 @@
-package com.rafaelamaral.csvgeneratorapp.repository;
+package com.rafaelamaral.csvgeneratorapp.service;
 
 import com.rafaelamaral.csvgeneratorapp.config.AppConfig;
 import com.rafaelamaral.csvgeneratorapp.model.DataModel;
 import com.rafaelamaral.csvgeneratorapp.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 
-@Component
 @Slf4j
-public class ExampleJdbcTemplate {
+@Service
+public class DataModelService {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final AppConfig.Property property;
 
-    @Autowired
-    private AppConfig.Property property;
+    public DataModelService(JdbcTemplate jdbcTemplate, AppConfig.Property property) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.property = property;
+    }
 
     public List<DataModel> generate() {
         var dataModelList = new ArrayList<DataModel>();
@@ -34,7 +34,7 @@ public class ExampleJdbcTemplate {
                 lines.forEach(line -> dataModel.getRows().add(toStringConvertRow(line.values())));
                 dataModelList.add(dataModel);
             } catch (Exception e) {
-                log.error("Error: " + e);
+                log.error("Error processing file '{}' {}", obj.getName(), e.toString());
             }
         });
         return dataModelList;
