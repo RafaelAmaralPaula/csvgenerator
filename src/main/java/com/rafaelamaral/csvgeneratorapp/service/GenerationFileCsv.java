@@ -1,7 +1,6 @@
 package com.rafaelamaral.csvgeneratorapp.service;
 
 import com.opencsv.CSVWriter;
-
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.rafaelamaral.csvgeneratorapp.repository.ExampleJdbcTemplate;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -20,26 +18,28 @@ public class GenerationFileCsv {
     @Autowired
     private ExampleJdbcTemplate exampleJdbcTemplate;
 
-    public void execute() throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+    public void execute() {
         generateCsvFile();
     }
 
-    private void generateCsvFile() throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+    private void generateCsvFile() {
 
-        // TODO: Iterar lista retornada
-        var dataModel = exampleJdbcTemplate.findOne();
+        exampleJdbcTemplate.generate().forEach(dataModel -> {
+            try {
+                var writer = Files.newBufferedWriter(Paths.get(FileUtils.createdDirectory("results") + "/" + dataModel.getFileName()));
+                var csvWriter = new CSVWriter(writer, ',',
+                        CSVWriter.NO_QUOTE_CHARACTER,
+                        CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                        CSVWriter.DEFAULT_LINE_END);
 
-        Writer writer = Files.newBufferedWriter(Paths.get(FileUtils.createdDirectory("results")+"/"+dataModel.getFileName()));
-        CSVWriter csvWriter = new CSVWriter(writer, ',',
-                CSVWriter.NO_QUOTE_CHARACTER,
-                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                CSVWriter.DEFAULT_LINE_END);
+                csvWriter.writeNext(dataModel.getHeader());
+                csvWriter.writeAll(dataModel.getRows());
 
-        csvWriter.writeNext(dataModel.getHeader());
-        csvWriter.writeAll(dataModel.getRows());
-
-        csvWriter.flush();
-        writer.close();
+                csvWriter.flush();
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
-
 }
