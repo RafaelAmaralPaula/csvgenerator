@@ -1,5 +1,7 @@
 package com.rafaelamaral.csvgeneratorapp.util;
 
+import com.rafaelamaral.csvgeneratorapp.model.QueryModel;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,14 +36,14 @@ public class FileUtils {
     }
 
     // TODO: Rafa mudar este Map de retorno para uma lista com POJOs
-    public static Map<String, String> getContentFile(String queriesPathName) {
-        var objects = new HashMap<String, String>();
+    public static List<QueryModel> getContentFile(String queriesPathName) {
+        var objects = new ArrayList<QueryModel>();
         getContentsAllFiles(queriesPathName).forEach(fileName -> {
             try {
                 StringBuilder sb = new StringBuilder();
                 readAllLines(Paths.get(queriesPathName + "/" + fileName))
                         .forEach(line -> sb.append(line.concat(" ")));
-                objects.put(fileName, sb.toString());
+                objects.add(new QueryModel(fileName, sb.toString()));
             } catch (IOException ignore) {
             }
         });
