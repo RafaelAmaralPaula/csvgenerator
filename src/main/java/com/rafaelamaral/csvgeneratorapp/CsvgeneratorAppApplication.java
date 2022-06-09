@@ -20,7 +20,7 @@ public class CsvgeneratorAppApplication {
 	@Bean
 	public CommandLineRunner run(CsvFileGenerator generationFileCsv)throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
 		return args -> {
-			generationFileCsv.execute();
+			generationFileCsv.generate();
 		};
 	}
 

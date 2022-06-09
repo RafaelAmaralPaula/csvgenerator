@@ -8,5 +8,5 @@ import lombok.Data;
 public class QueryModel {
 
     private String name;
-    private String query;
+    private String content;
 }

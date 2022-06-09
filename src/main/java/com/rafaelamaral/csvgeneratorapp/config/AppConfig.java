@@ -12,9 +12,11 @@ public class AppConfig {
     @Component
     public class Property {
 
-        @Value("${queries-path-name}")
+        @Value("${queries-path-name:queries}")
         private String queriesPathName;
 
+        @Value("${results-path-name:results}")
+        private String resultsPathName;
     }
 
 }

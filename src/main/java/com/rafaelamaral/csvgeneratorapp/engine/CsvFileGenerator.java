@@ -1,54 +1,50 @@
 package com.rafaelamaral.csvgeneratorapp.engine;
 
 import com.opencsv.CSVWriter;
-import com.rafaelamaral.csvgeneratorapp.model.DataModel;
+import com.rafaelamaral.csvgeneratorapp.config.AppConfig;
 import com.rafaelamaral.csvgeneratorapp.service.DataModelService;
 import com.rafaelamaral.csvgeneratorapp.util.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+
+import static com.opencsv.ICSVWriter.DEFAULT_ESCAPE_CHARACTER;
+import static com.opencsv.ICSVWriter.DEFAULT_LINE_END;
+import static com.opencsv.ICSVWriter.DEFAULT_SEPARATOR;
+import static com.opencsv.ICSVWriter.NO_QUOTE_CHARACTER;
+import static com.rafaelamaral.csvgeneratorapp.util.FileUtils.createdDirectory;
+import static com.rafaelamaral.csvgeneratorapp.util.FileUtils.makeFile;
+import static java.nio.file.Files.newBufferedWriter;
 
 @Service
 public class CsvFileGenerator {
 
     private final DataModelService service;
+    private final AppConfig.Property property;
 
-    public CsvFileGenerator(DataModelService service) {
+    public CsvFileGenerator(DataModelService service, AppConfig.Property property) {
         this.service = service;
+        this.property = property;
     }
 
-    public void execute() {
-        service.generate().forEach(dataModel -> {
-            var executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
-            executor.setKeepAliveTime(2, TimeUnit.MINUTES);
-            executor.allowCoreThreadTimeOut(true);
-            executor.execute(getResults(dataModel));
-        });
-    }
+    public void generate() {
+        var path = createdDirectory(property.getResultsPathName());
+        service.consult()
+                .parallelStream()
+                .forEach(dataModel -> {
+                    try {
+                        var writer = newBufferedWriter(Paths.get(makeFile(path, dataModel.getFileName())));
+                        var csvWriter = new CSVWriter(writer, DEFAULT_SEPARATOR, NO_QUOTE_CHARACTER, DEFAULT_ESCAPE_CHARACTER, DEFAULT_LINE_END);
 
-    private Runnable getResults(DataModel dataModel) {
-        return () -> {
-            try {
-                var file = FileUtils.createdDirectory("results") + "/" + dataModel.getFileName();
-                var writer = Files.newBufferedWriter(Paths.get(file));
-                var csvWriter = new CSVWriter(writer, ',',
-                        CSVWriter.NO_QUOTE_CHARACTER,
-                        CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                        CSVWriter.DEFAULT_LINE_END);
+                        csvWriter.writeNext(dataModel.getHeader());
+                        csvWriter.writeAll(dataModel.getRows());
 
-                csvWriter.writeNext(dataModel.getHeader());
-                csvWriter.writeAll(dataModel.getRows());
-
-                csvWriter.flush();
-                writer.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
+                        csvWriter.flush();
+                        writer.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 }
